@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mini Expedición</title>
+<style>
+:root{--bg:#F4EFE6;--card:#FFFDF8;--text:#2F3A32;--muted:#6E756F;--accent:#7A9B76;--accent-dark:#5F7C5C;--soft:#DCE8D9;--shadow:0 12px 30px rgba(47,58,50,.10)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:ui-rounded,"SF Pro Rounded","Nunito",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;padding:20px}
+.app{width:min(100%,520px)} .card{background:var(--card);border-radius:28px;box-shadow:var(--shadow);padding:26px 22px;min-height:610px;display:flex;flex-direction:column;justify-content:space-between}
+.top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:14px} .pill{background:var(--soft);color:var(--accent-dark);padding:8px 12px;border-radius:999px;font-weight:700}
+.center{text-align:center;padding:24px 4px} .emoji{font-size:72px;margin-bottom:16px;display:block} h1{font-size:33px;line-height:1.1;margin:0 0 12px} p{margin:0;font-size:18px;line-height:1.45;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px} .place{background:#fff;border:2px solid #ECE9E0;border-radius:18px;padding:16px 10px;font-size:16px;font-weight:800;cursor:pointer} .place small{display:block;font-weight:500;color:var(--muted);margin-top:4px}
+button{appearance:none;border:0;border-radius:18px;min-height:58px;padding:16px 20px;font-size:18px;font-weight:800;cursor:pointer;width:100%} .primary{background:var(--accent);color:#fff} .secondary{margin-top:10px;background:transparent;color:var(--accent-dark);border:2px solid var(--soft)}
+.mission{font-size:32px;font-weight:800;line-height:1.18;margin:16px 0 8px} .hint{font-size:16px;color:var(--muted)} .progress{display:flex;gap:8px;justify-content:center;margin-top:18px} .dot{width:9px;height:9px;border-radius:50%;background:#D7D7D0} .dot.active{background:var(--accent)} .small{font-size:13px;color:var(--muted);text-align:center;margin-top:12px} .type{display:inline-block;margin-top:10px;padding:7px 10px;border-radius:999px;background:#F0ECE4;color:var(--muted);font-size:13px;font-weight:700}
+</style>
+</head>
+<body>
+<main class="app"><section class="card">
+<div class="top"><span>Mini Expedición</span><span class="pill" id="counter">3–5 años</span></div>
+<div class="center" id="screen"></div>
+<div><button class="primary" id="mainBtn" style="display:none"></button><button class="secondary" id="secondaryBtn" style="display:none"></button><div class="progress" id="progress"></div><div class="small" id="footer"></div></div>
+</section></main>
+
+<script>
+const DATA = {"Casa": [["🧸", "Encuentra algo suave.", "Tócalo con la mano. ¿Cómo se siente?", "Tacto"], ["⚪", "Busca algo redondo.", "Míralo desde distintos lados.", "Observación"], ["🎨", "Trae 2 cosas del mismo color.", "Ponlas juntas y compáralas.", "Clasificación"], ["🫙", "Encuentra algo que tenga una tapa.", "Ábrelo solo si un adulto dice que es seguro.", "Observación"], ["🤏", "Busca algo más pequeño que tu mano.", "Míralo bien antes de regresar.", "Tamaño"], ["🔔", "Encuentra algo que haga un sonido.", "Hazlo sonar una sola vez.", "Sonido"], ["🧹", "Busca algo que usamos para limpiar.", "¿Para qué sirve?", "Asociación"], ["❄️", "Encuentra algo frío.", "Tócalo solo si es seguro.", "Tacto"], ["📏", "Busca 3 objetos y ordénalos de pequeño a grande.", "¿Cuál quedó al medio?", "Clasificación"], ["👃", "Encuentra algo que huela rico.", "Acércalo sin llevártelo a la boca.", "Olfato"], ["🐈", "Camina como un gato hasta la siguiente habitación.", "Hazlo despacio.", "Movimiento"], ["⬜", "Busca algo que tenga esquinas.", "Cuenta cuántas ves.", "Formas"], ["⚽", "Encuentra algo que pueda rodar.", "Hazlo rodar suavemente.", "Experimentación"], ["👀", "Encuentra algo que nunca habías observado bien.", "Míralo durante 5 segundos.", "Atención"], ["💭", "Elige un objeto y dinos a qué otra cosa se parece.", "No hay respuestas correctas.", "Imaginación"]], "Playa": [["👣", "Busca una huella en la arena.", "¿Es de una persona, un animal o algo más?", "Observación"], ["🤏", "Encuentra algo más pequeño que tu dedo.", "No recojas nada peligroso.", "Tamaño"], ["🎨", "Busca 3 cosas de colores diferentes.", "Señálalas una por una.", "Colores"], ["〰️", "Haz una línea larga en la arena.", "Usa tu dedo o un palito seguro.", "Movimiento"], ["🍃", "Encuentra algo que se mueva con el viento.", "Obsérvalo unos segundos.", "Observación"], ["🌊", "Escucha el mar durante 5 segundos.", "¿Suena fuerte o suave?", "Sonido"], ["🐚", "Busca algo que el mar haya dejado en la orilla.", "Míralo sin necesidad de llevártelo.", "Exploración"], ["🏖️", "Haz una montaña pequeña de arena.", "¿Puedes hacerla más alta?", "Construcción"], ["✋", "Encuentra una textura áspera y una suave.", "Compáralas con tus dedos.", "Tacto"], ["5️⃣", "Cuenta 5 pasos sobre la arena.", "Hazlos despacio.", "Conteo"], ["💧", "Busca algo que esté mojado y algo que esté seco.", "¿Qué diferencia notas?", "Comparación"], ["🖐️", "Haz una huella con tu mano en la arena.", "Mira bien la forma que queda.", "Sensorial"], ["↔️", "Encuentra dos cosas de tamaños distintos.", "¿Cuál es más grande?", "Comparación"], ["🔭", "Observa el mar y señala algo que esté muy lejos.", "Puede ser un bote, persona o ave.", "Distancia"], ["💭", "Imagina que una piedra o conchita es un personaje.", "¿Cómo se llamaría?", "Imaginación"]], "Campo": [["🌿", "Encuentra 3 tonos distintos de verde.", "Señálalos uno por uno.", "Colores"], ["🍂", "Busca una hoja pequeña y una grande.", "No hace falta arrancarlas.", "Comparación"], ["🐦", "Escucha: ¿puedes reconocer un sonido de animal?", "Quédate en silencio unos segundos.", "Sonido"], ["👃", "Encuentra algo que huela a naturaleza.", "Puede ser una planta, tierra o madera.", "Olfato"], ["🌳", "Busca una textura rugosa.", "Tócala suavemente.", "Tacto"], ["🌱", "Encuentra algo que esté creciendo.", "Obsérvalo sin tocarlo.", "Naturaleza"], ["5️⃣", "Cuenta 5 árboles, plantas o arbustos.", "Puedes señalarlos mientras cuentas.", "Conteo"], ["🚶", "Camina despacio durante 10 pasos mirando el suelo.", "Siempre junto a un adulto.", "Movimiento"], ["🔷", "Busca algo que tenga una forma interesante.", "¿A qué se parece?", "Observación"], ["🌤️", "Encuentra una sombra.", "¿De qué objeto viene?", "Luz"], ["🍃", "Busca algo que se mueva con el viento.", "Míralo unos segundos.", "Observación"], ["🟤", "Encuentra algo marrón.", "Puede estar en el suelo o en una planta.", "Colores"], ["⬆️", "Mira hacia arriba y descubre algo que no habías visto.", "¿Qué encontraste?", "Atención"], ["🐞", "Busca algo que creas que un insecto podría usar como escondite.", "Solo obsérvalo.", "Imaginación"], ["✋", "Elige una planta y describe cómo se siente sin arrancarla.", "Suave, rugosa, húmeda...", "Sensorial"]], "Departamento de playa": [["🌊", "Busca algo que te recuerde al mar.", "¿Por qué te recuerda al mar?", "Asociación"], ["🔵", "Encuentra algo azul.", "Señálalo.", "Colores"], ["🪟", "Mira por la ventana y encuentra algo que se mueva.", "Puede ser una persona, auto, ave o planta.", "Observación"], ["🛋️", "Busca algo suave donde puedas descansar.", "Tócalo.", "Tacto"], ["🩴", "Encuentra un objeto que usarías para ir a la playa.", "¿Para qué sirve?", "Asociación"], ["🧢", "Busca algo que proteja del sol.", "¿Cómo te protege?", "Asociación"], ["🔢", "Cuenta cuántas ventanas puedes ver.", "Hazlo despacio.", "Conteo"], ["⚪", "Encuentra algo redondo en la cocina o sala.", "Señálalo.", "Formas"], ["👂", "Escucha durante 5 segundos: ¿puedes oír el mar?", "Si no, ¿qué sí puedes oír?", "Sonido"], ["🪶", "Encuentra algo liviano.", "Sosténlo con una mano si es seguro.", "Peso"], ["🎨", "Busca 2 objetos del mismo color.", "Ponlos cerca si puedes.", "Clasificación"], ["🦀", "Camina hasta la puerta como un cangrejo.", "Hazlo despacio y con espacio.", "Movimiento"], ["👜", "Encuentra algo que usarías para llevar cosas a la playa.", "¿Qué pondrías dentro?", "Asociación"], ["☁️", "Mira el cielo y dinos qué color tiene hoy.", "¿Ves nubes?", "Observación"], ["📖", "Elige un objeto y conviértelo en parte de una historia de mar.", "¿Qué papel tendría?", "Imaginación"]], "Edificio": [["🔢", "Encuentra un número.", "Puede estar en una puerta, ascensor o señal.", "Observación"], ["🚪", "Busca una puerta de un color diferente.", "No hace falta acercarte.", "Colores"], ["💡", "Cuenta 3 luces.", "Señálalas una por una.", "Conteo"], ["👂", "Escucha un sonido del edificio.", "¿De dónde crees que viene?", "Sonido"], ["🔩", "Encuentra algo metálico.", "Míralo sin tocar si no es necesario.", "Materiales"], ["⬆️", "Busca algo más alto que tú.", "¿Cuánto más alto crees que es?", "Tamaño"], ["▭", "Encuentra una forma rectangular.", "Puede ser una puerta, ventana o cartel.", "Formas"], ["🧩", "Mira el piso y descubre un patrón.", "¿Se repite?", "Observación"], ["🚪", "Cuenta cuántas puertas ves desde donde estás.", "Sin alejarte del adulto.", "Conteo"], ["↕️", "Busca algo que se abra y se cierre.", "¿Qué es?", "Asociación"], ["🚸", "Encuentra una señal o símbolo.", "¿Qué crees que significa?", "Observación"], ["🪟", "Mira por una ventana y señala algo lejano.", "No te apoyes en la ventana.", "Distancia"], ["🧹", "Encuentra algo que sirva para mantener limpio el lugar.", "¿Qué función cumple?", "Asociación"], ["🚶", "Camina 5 pasos muy despacio junto a un adulto.", "Sin correr.", "Movimiento"], ["🔷", "Elige una forma que veas y busca otra igual.", "Compáralas.", "Clasificación"]], "Calle": [["🚗", "Encuentra un auto de un color específico.", "Siempre junto a un adulto.", "Colores"], ["🌳", "Busca un árbol.", "¿Es grande o pequeño?", "Observación"], ["⭕", "Encuentra un círculo en algún letrero.", "No hace falta cruzar la calle.", "Formas"], ["🪟", "Cuenta 3 ventanas.", "Pueden ser de una casa, auto o tienda.", "Conteo"], ["👂", "Escucha un sonido de la calle.", "¿Qué crees que lo produjo?", "Sonido"], ["➡️", "Busca algo que se esté moviendo.", "Obsérvalo desde un lugar seguro.", "Observación"], ["⬆️", "Encuentra algo más alto que tú.", "Señálalo.", "Tamaño"], ["🟡", "Busca algo amarillo.", "Puede estar cerca o lejos.", "Colores"], ["🔤", "Encuentra una letra que conozcas.", "Puede estar en un cartel.", "Letras"], ["🏠", "Observa una fachada y encuentra dos colores.", "Nómbralos.", "Colores"], ["🌺", "Encuentra una planta o flor.", "Solo obsérvala.", "Naturaleza"], ["🛞", "Busca algo que tenga ruedas.", "¿Cuántas ruedas ves?", "Asociación"], ["🔺", "Mira una señal y describe qué forma tiene.", "Círculo, cuadrado, triángulo...", "Formas"], ["🌳", "Encuentra algo que dé sombra.", "¿Dónde cae la sombra?", "Observación"], ["💭", "Elige algo que veas y piensa para qué sirve.", "Cuéntaselo al adulto.", "Asociación"]], "Auto": [["🚗", "Encuentra un auto rojo.", "Míralo por la ventana.", "Colores"], ["🌳", "Cuenta 3 árboles.", "Señálalos mientras pasan.", "Conteo"], ["🟡", "Busca algo amarillo por la ventana.", "Puede ser un cartel, auto o edificio.", "Colores"], ["🚌", "Encuentra un vehículo más grande que nuestro auto.", "¿Qué tipo de vehículo es?", "Comparación"], ["⭕", "Busca una señal con forma de círculo.", "Mírala desde tu asiento.", "Formas"], ["🏍️", "Encuentra una moto.", "¿De qué color es?", "Observación"], ["👂", "Escucha un sonido de afuera.", "¿Qué crees que lo hizo?", "Sonido"], ["🏢", "Busca un edificio muy alto.", "Cuenta algunos pisos si puedes.", "Tamaño"], ["🔤", "Encuentra una letra que conozcas en un cartel.", "Dila en voz alta.", "Letras"], ["5️⃣", "Cuenta 5 autos de cualquier color.", "Sin apurarte.", "Conteo"], ["💨", "Busca algo que se mueva más rápido que nosotros.", "Obsérvalo desde tu asiento.", "Comparación"], ["🟢", "Encuentra algo verde.", "Puede ser una planta, cartel o vehículo.", "Colores"], ["🔭", "Mira hacia afuera y encuentra algo que esté muy lejos.", "¿Qué es?", "Distancia"], ["💡", "Busca algo que tenga luces.", "¿Están prendidas o apagadas?", "Observación"], ["💭", "Elige algo que veas por la ventana e inventa adónde podría ir.", "Cuéntalo como una mini historia.", "Imaginación"]]};
+const placeMeta = {
+  "Casa":["🏠","Explorar lo cotidiano"],
+  "Playa":["🌊","Arena, mar y sentidos"],
+  "Campo":["🌿","Naturaleza y observación"],
+  "Departamento de playa":["🏖️","Interior + entorno costero"],
+  "Edificio":["🏢","Explorar sin correr"],
+  "Calle":["🚶","Siempre con un adulto"],
+  "Auto":["🚗","Todo desde tu asiento"]
+};
+let place=null, selected=[], index=-1, state="places";
+
+const screen=document.getElementById("screen"), btn=document.getElementById("mainBtn"), secondary=document.getElementById("secondaryBtn"), progress=document.getElementById("progress"), counter=document.getElementById("counter"), footer=document.getElementById("footer");
+
+function showPlaces(){
+  state="places"; place=null; selected=[]; index=-1;
+  counter.textContent="3–5 años"; btn.style.display="none"; secondary.style.display="none"; progress.innerHTML="";
+  footer.textContent="Elige el lugar donde están ahora.";
+  screen.innerHTML=`<span class="emoji">🧭</span><h1>¿Dónde estamos hoy?</h1><p>Elegiremos una expedición segura y diferente según el lugar.</p><div class="grid">${Object.entries(placeMeta).map(([p,m])=>`<button class="place" onclick="choosePlace('${p.replace(/'/g,"\'")}')"><div style="font-size:34px">${m[0]}</div>${p}<small>${m[1]}</small></button>`).join("")}</div>`;
+}
+
+function balancedPick(list,n=5){
+  const shuffled=[...list].sort(()=>Math.random()-.5);
+  const picked=[]; const usedTypes=new Set();
+  for(const m of shuffled){ if(!usedTypes.has(m[3]) && picked.length<n){picked.push(m);usedTypes.add(m[3]);} }
+  for(const m of shuffled){ if(picked.length>=n) break; if(!picked.includes(m)) picked.push(m); }
+  return picked;
+}
+
+function choosePlace(p){
+  place=p; selected=balancedPick(DATA[p],5); index=0; state="mission"; renderMission();
+}
+
+function renderProgress(){
+  progress.innerHTML=selected.map((_,i)=>`<span class="dot ${i<=index?'active':''}"></span>`).join("");
+}
+
+function renderMission(){
+  const [emoji,text,hint,type]=selected[index];
+  screen.innerHTML=`<span class="emoji">${emoji}</span><p>Tu misión es:</p><div class="mission">${text}</div><div class="hint">${hint}</div><span class="type">${type}</span>`;
+  counter.textContent=`${place} · ${index+1}/5`;
+  btn.style.display="block"; btn.textContent="¡Lo encontré!";
+  secondary.style.display="block"; secondary.textContent="Cambiar reto";
+  footer.textContent=place==="Auto"?"Haz todo desde tu asiento.":(place==="Calle"||place==="Edificio"?"Siempre junto a un adulto.":"Deja el celular aquí y vuelve cuando termines.");
+  renderProgress();
+}
+
+function renderFound(){
+  screen.innerHTML=`<span class="emoji">✨</span><h1>¡Lo hiciste!</h1><p>Mira un momento lo que encontraste o hiciste. No hace falta hacerlo rápido.</p>`;
+  btn.textContent=index===4?"Terminar expedición":"Siguiente misión";
+  secondary.style.display="none";
+  footer.textContent="La pantalla guía. El juego pasa afuera.";
+  state="found";
+}
+
+function renderEnd(){
+  screen.innerHTML=`<span class="emoji">🌱</span><h1>Expedición terminada</h1><p>Hoy exploraste <strong>${place.toLowerCase()}</strong> usando la pantalla solo como punto de partida.</p>`;
+  counter.textContent="¡Bien hecho!";
+  btn.textContent="Elegir otro lugar"; btn.style.display="block";
+  secondary.style.display="block"; secondary.textContent="Otra expedición aquí";
+  progress.innerHTML=""; footer.textContent="Menos pantalla. Más mundo real."; state="end";
+}
+
+btn.addEventListener("click",()=>{
+  if(state==="mission") renderFound();
+  else if(state==="found"){ if(index===4) renderEnd(); else{index++;state="mission";renderMission();} }
+  else if(state==="end") showPlaces();
+});
+
+secondary.addEventListener("click",()=>{
+  if(state==="mission"){
+    const pool=DATA[place].filter(m=>!selected.includes(m));
+    if(pool.length) selected[index]=pool[Math.floor(Math.random()*pool.length)];
+    renderMission();
+  } else if(state==="end"){
+    selected=balancedPick(DATA[place],5); index=0; state="mission"; renderMission();
+  }
+});
+
+showPlaces();
+</script>
+</body>
+</html>
